@@ -26,9 +26,9 @@ function show(req, res) {
 
     const sqlJoin = ` 
     SELECT *
-    FROM posts
-    JOIN tags ON post_tags.tag_id = tags.id
-    WHERE post_tags.post_id = posts.id
+    FROM post_tag
+    JOIN tags ON post_tag.tag_id = tags.id
+    WHERE post_tag.post_id = ${postId}
     `
 
     connection.query(sql, [postId], (err, results) => {

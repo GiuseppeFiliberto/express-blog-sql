@@ -20,21 +20,27 @@ function index(req, res) {
 
 function show(req, res) {
 
-    const slug = req.params.slug
+    const postId = req.params.id
 
-    const singlePost = posts.find(posts => posts.slug.includes(slug))
-    console.log(singlePost);
+    const sql = 'SELECT * FROM posts WHERE id = ?';
 
-    if (!singlePost) {
-        return res.status(404).json({
-            error: '404 not found',
-            message: 'post not found'
-        })
-    } else {
-        res.json(singlePost)
+    connection.query(sql, [postId], (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error retrieving post from database');
+            return;
+        }
 
+        if (results.length === 0) {
+            return res.status(404).json({
+                error: '404 not found',
+                message: 'post not found'
+            })
+        }
+
+        res.json(results[0]);
     }
-
+    );
 }
 
 function store(req, res) {

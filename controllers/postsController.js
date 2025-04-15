@@ -24,6 +24,13 @@ function show(req, res) {
 
     const sql = 'SELECT * FROM posts WHERE id = ?';
 
+    const sqlJoin = ` 
+    SELECT *
+    FROM posts
+    JOIN tags ON post_tags.tag_id = tags.id
+    WHERE post_tags.post_id = posts.id
+    `
+
     connection.query(sql, [postId], (err, results) => {
         if (err) {
             console.error(err);
@@ -38,7 +45,21 @@ function show(req, res) {
             })
         }
 
-        res.json(results[0]);
+        const singlePost = results[0];
+        console.log(singlePost);
+
+        connection.query(sqlJoin, [postId], (err, tagsResult) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send('Error retrieving post tags from database');
+                return;
+            }
+            console.log(tagsResult);
+
+            singlePost.tags = tagsResult
+            res.json(singlePost);
+
+        })
     }
     );
 }

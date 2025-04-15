@@ -107,22 +107,25 @@ function modify(req, res) {
 }
 
 
-const destroy = (req, res) => {
+function destroy(req, res) {
 
-    const postTitle = req.params.title
+    const sql = 'DELETE FROM posts WHERE id = ?';
 
-    const post = posts.find(posts => posts.title === postTitle)
+    const postId = Number(req.params.id)
 
-    if (!post) {
-        return res.status(404).json({
-            error: '404 not found',
-            message: 'post not found'
-        })
-    } else {
-        posts.splice(posts.indexOf(post), 1)
-    }
+    connection.query(sql, [postId], (err) => {
 
-    res.sendStatus(204)
+        if (err) {
+            console.error(err);
+            res.status(500).json({
+                error: 'Database error',
+                message: 'Error deleting post from database'
+            });
+            return;
+        }
+
+        res.sendStatus(204);
+    });
 
 }
 

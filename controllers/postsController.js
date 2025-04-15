@@ -1,34 +1,40 @@
-const posts = require('../data/posts')
+// const posts = require('../data/posts')
+const connection = require('../data/db')
 
 
-function index(req, res){
+function index(req, res) {
 
-    let filteredPost = posts;
+    const sql = 'SELECT * FROM posts';
 
-    if (req.query.tag){
-        filteredPost = posts.filter(post => posts.tags && post.tags.includes(req.query.tag))
-    }
-    
-    res.json(filteredPost);
+    connection.query(sql, (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error retrieving pizzas from database');
+            return;
+        }
+        console.log(results);
+
+        res.json(results);
+    });
 }
 
-function show(req, res){
+function show(req, res) {
 
     const slug = req.params.slug
 
     const singlePost = posts.find(posts => posts.slug.includes(slug))
     console.log(singlePost);
 
-    if (!singlePost){
+    if (!singlePost) {
         return res.status(404).json({
             error: '404 not found',
             message: 'post not found'
         })
-    } else{
-    res.json(singlePost)
+    } else {
+        res.json(singlePost)
 
     }
-    
+
 }
 
 function store(req, res) {
@@ -44,10 +50,10 @@ function store(req, res) {
 
     posts.push(newPost);
     console.log(posts);
-    
+
     res.status(201);
     res.json(newPost);
-    
+
 }
 
 function update(req, res) {
@@ -56,63 +62,63 @@ function update(req, res) {
 
     const singlePost = posts.find(posts => posts.slug === slug)
 
-    if (!singlePost){
+    if (!singlePost) {
         return res.status(404).json({
             error: '404 not found',
             message: 'post not found'
         })
-    } 
-        // this will update the post selected
-        singlePost.title = req.body.title;
-        singlePost.slug = req.body.title.toLowerCase().replace(/ /g, '-');
-        singlePost.content = req.body.content;
-        singlePost.image = req.body.image;
-        singlePost.tags = req.body.tags;
-
-        res.json(singlePost);
-
-         console.log(singlePost);
-
     }
-    
+    // this will update the post selected
+    singlePost.title = req.body.title;
+    singlePost.slug = req.body.title.toLowerCase().replace(/ /g, '-');
+    singlePost.content = req.body.content;
+    singlePost.image = req.body.image;
+    singlePost.tags = req.body.tags;
+
+    res.json(singlePost);
+
+    console.log(singlePost);
+
+}
+
 function modify(req, res) {
 
     const slug = req.params.slug
 
     const singlePost = posts.find(posts => posts.slug === slug)
 
-    if (!singlePost){
+    if (!singlePost) {
         return res.status(404).json({
             error: '404 not found',
             message: 'post not found'
         })
-    } 
-        // this will update the post selected
-        singlePost.title = req.body.title;
-        singlePost.slug = req.body.title.toLowerCase().replace(/ /g, '-');
-        singlePost.content = req.body.content;
-        singlePost.image = req.body.image;
-        singlePost.tags = req.body.tags;
-
-        res.json(singlePost);
-        
-         console.log(singlePost);
-
     }
+    // this will update the post selected
+    singlePost.title = req.body.title;
+    singlePost.slug = req.body.title.toLowerCase().replace(/ /g, '-');
+    singlePost.content = req.body.content;
+    singlePost.image = req.body.image;
+    singlePost.tags = req.body.tags;
+
+    res.json(singlePost);
+
+    console.log(singlePost);
+
+}
 
 
 const destroy = (req, res) => {
 
     const postTitle = req.params.title
-   
+
     const post = posts.find(posts => posts.title === postTitle)
 
-    if (!post){
+    if (!post) {
         return res.status(404).json({
             error: '404 not found',
             message: 'post not found'
         })
-    } else{
+    } else {
         posts.splice(posts.indexOf(post), 1)
     }
 
